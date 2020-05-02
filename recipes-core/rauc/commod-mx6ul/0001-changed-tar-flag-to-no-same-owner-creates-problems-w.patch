@@ -1,0 +1,23 @@
+From 32ea338cbbfb9d3c10f8041239ba64116cd41831 Mon Sep 17 00:00:00 2001
+From: llewellyn-evo <llewellyn.fernandes@evologics.de>
+Date: Sat, 2 May 2020 02:23:55 +0200
+Subject: [PATCH] changed tar flag to --no-same-owner creates problems when
+ image built by user with same uuid
+
+---
+ src/update_handler.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/update_handler.c b/src/update_handler.c
+index b8d044f..808a40f 100644
+--- a/src/update_handler.c
++++ b/src/update_handler.c
+@@ -588,7 +588,7 @@ static gboolean untar_image(RaucImage *image, gchar *dest, GError **error)
+ 	g_ptr_array_add(args, g_strdup(image->filename));
+ 	g_ptr_array_add(args, g_strdup("-C"));
+ 	g_ptr_array_add(args, g_strdup(dest));
+-	g_ptr_array_add(args, g_strdup("--numeric-owner"));
++	g_ptr_array_add(args, g_strdup("--no-same-owner"));
+ 	g_ptr_array_add(args, NULL);
+ 
+ 	r_debug_subprocess(args);
