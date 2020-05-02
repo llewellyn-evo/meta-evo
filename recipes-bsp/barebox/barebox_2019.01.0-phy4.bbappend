@@ -2,6 +2,7 @@ FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}:"
 
 SRC_URI += "file://0001-enabled-fec2.patch \
             file://0001-Changed-hostname.patch \
+            file://0001-Added-state-variables-in-eeprom.patch \
             "
 
 
@@ -42,14 +43,26 @@ python do_env_append_mx6ul(){
     barebox_update -t mmc1 /mnt/tftp/barebox.bin
     """)
 
+    env_add(d, "boot/emmc2",
+    """#!/bin/sh
+
+    global.bootm.image=/mnt/mmc1.2/zImage
+    global.bootm.oftree=/mnt/mmc1.2/oftree
+    global.linux.bootargs.dyn.root="root=/dev/mmcblk1p5 rootflags='data=journal'"
+    """)
+    
     env_rm(d, "boot/system0")
     env_rm(d, "boot/system1")
-    env_rm(d, "nv/bootchooser.targets")
-    env_rm(d, "nv/bootchooser.system0.boot")
-    env_rm(d, "nv/bootchooser.system1.boot")
-    env_rm(d, "nv/bootchooser.state_prefix")
     env_rm(d, "bin/rauc_flash_nand_from_mmc")
     env_rm(d, "bin/rauc_flash_nand_from_tftp")
+    env_rm(d, "bin/rauc_init_nand")
+    env_rm(d, "config-expansions")
+
+    env_add(d, "nv/bootchooser.state_prefix", """state""")
+    env_add(d, "nv/bootchooser.targets", """system0 system1""")
+    env_add(d, "nv/bootchooser.system0.boot", """emmc""")
+    env_add(d, "nv/bootchooser.system1.boot", """emmc2""")
+    env_add(d, "nv/bootchooser.state_prefix", """state.bootstate""")
 }
 
 COMPATIBLE_MACHINE += "|mx6ul-comm-module"
